@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-
-import Title from './Title';
-import Input from './Input';
-import Result from './Result';
+import PizzaCalculator from './pizzaCalculator'
 
 import calculatePizzasNeeded from './lib/calculate-pizzas-needed';
 
@@ -11,9 +8,11 @@ const initialState = {
   slicesPerPerson: 2,
 };
 
-export default class Application extends Component {
+const WithPizzaCalculations = WrappedComponent => class extends Component {
+  
+  static displayName = `WithPizzaCalculations(${WrappedComponent.displayName || WrappedComponent.name})`
   state = { ...initialState };
-
+ 
   updateNumberOfPeople = event => {
     const numberOfPeople = parseInt(event.target.value, 10);
     this.setState({ numberOfPeople });
@@ -36,27 +35,24 @@ export default class Application extends Component {
     );
 
     return (
-      <div className="Application">
-        <Title />
-        <Input
-          label="Number of Guests"
-          type="number"
-          min={0}
-          value={numberOfPeople}
-          onChange={this.updateNumberOfPeople}
-        />
-        <Input
-          label="Slices Per Person"
-          type="number"
-          min={0}
-          value={slicesPerPerson}
-          onChange={this.updateSlicesPerPerson}
-        />
-        <Result amount={numberOfPizzas} />
-        <button className="full-width" onClick={this.reset}>
-          Reset
-        </button>
-      </div>
+      <WrappedComponent 
+        numberOfPizzas={numberOfPizzas}
+        numberOfPeople={numberOfPeople}
+        slicesPerPerson={slicesPerPerson}
+        updateSlicesPerPerson={this.updateSlicesPerPerson}
+        updateNumberOfPeople={this.updateNumberOfPeople}
+        reset={this.reset}
+      />
     );
+  }
+}
+
+const NewComponent = WithPizzaCalculations(PizzaCalculator)
+
+export default class Application extends Component{
+  render(){
+    return (
+      <NewComponent />
+    )
   }
 }
